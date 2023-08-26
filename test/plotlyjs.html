@@ -1,0 +1,27 @@
+<html>
+
+<head>
+    <title>Plotly.js</title>
+    <script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
+    <!-- <style>
+    html,
+    body {
+      background-color: black;
+      color: white;
+    }
+  </style> -->
+</head>
+
+<body>
+    <h1>Plotly.js</h1>
+    <div id="gd"></div>
+
+    <script>
+        Plotly.newPlot("gd", /* JSON object */ {
+            "data": [{ "y": [1, 2, 3] }],
+            "layout": { "width": 600, "height": 400 }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "md2html",
+  "version": "1.0.0",
+  "description": "",
+  "main": "md2html.js",
+  "scripts": {
+    "start": "node md2html.js",
+    "release": "pkg -t win md2html.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "highlight.js": "^11.8.0",
+    "marked": "^7.0.4",
+    "marked-bidi": "^1.0.4",
+    "marked-extended-tables": "^1.0.6",
+    "marked-gfm-heading-id": "^3.0.6",
+    "marked-highlight": "^2.0.4",
+    "nomnoml": "^1.6.2"
+  }
+}
