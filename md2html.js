@@ -72,11 +72,16 @@ function convert(jsonObj) {
     // 读取配置信息
     let isDebug = jsonObj.isDebug;
     let theme = jsonObj.theme;
+    let highlightTheme = jsonObj.highlightTheme;
+    let mermaidTheme = jsonObj.mermaidTheme;
+    let smilesTheme = jsonObj.smilesTheme;
+    let wavedromTheme = jsonObj.wavedromTheme;
+    let jsmindTheme = jsonObj.jsmindTheme;
     let sourcePath = jsonObj.sourcePath;
     let publicPath = jsonObj.publicPath;
 
     let listPath = path.join(sourcePath, 'list.txt');
-    let templatePath = path.join(publicPath,'templates/'+theme+'.html');
+    let templatePath = path.join(publicPath, 'template.html');
 
 
     // 获取所有文件
@@ -164,7 +169,13 @@ function convert(jsonObj) {
                 return nomnoml.renderSvg(code);
             }
             else if (lang === 'tikz') {
-                return '<script type="text/tikz">' + code + '</script>\n'
+                return '<script type="text/tikz">' + code + '</script>\n';
+            }
+            else if (lang === 'flowchart') {
+                return '<script id="' + slugger.slug(lang) + '" type="text/flowchart">' + code + '</script>\n';
+            }
+            else if (lang === 'jsmind') {
+                return '<script id="' + slugger.slug(lang) + '" type="text/jsmind">' + code + '</script>\n';
             }
             else {
                 return false;
@@ -196,12 +207,18 @@ function convert(jsonObj) {
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
         const templateHtml = fs.readFileSync(templatePath);
-        const htmlName = item.name.replace('.md', '').replace('index', '目录');
+        const htmlName = item.name.replace('.md', '').replace('index', path.basename(path.dirname(item.path))).replace('source', '笔记');
         const htmlPath = item.path.replace('.md', '.html');
         const contextData = {
             title: htmlName,
             content: marked.parse(fs.readFileSync(item.path, 'utf-8')),
-            public_path: path.relative(path.dirname(htmlPath),publicPath).split(path.sep).join('/')
+            public_path: path.relative(path.dirname(htmlPath), publicPath).split(path.sep).join('/'),
+            theme: theme,
+            highlight_theme: highlightTheme,
+            mermaid_theme: mermaidTheme,
+            smiles_theme: smilesTheme,
+            wavedrom_theme: wavedromTheme,
+            jsmind_theme: jsmindTheme
         };
 
         const compiledHtml = templateCompile(templateHtml, contextData);

@@ -1,6 +1,11 @@
 {
     "isDebug": true,
-    "theme": "light",
+    "theme": "dark",
+    "highlightTheme": "atom-one-dark",
+    "mermaidTheme": "dark",
+    "smilesTheme": "dark",
+    "wavedromTheme": "lowkey",
+    "jsmindTheme": "default",
     "sourcePath": "D:/Code/GitHub/md2html/source",
     "publicPath": "D:/Code/Gitee/notes/public"
 }

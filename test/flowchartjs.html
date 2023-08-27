@@ -1,0 +1,99 @@
+<html>
+
+<head>
+  <title>flowchart.js</title>
+  <!-- <style>
+    html,
+    body {
+      background-color: black;
+      color: white;
+    }
+  </style> -->
+  <script>
+    function addLoadEvent(func) {
+      var oldonload = window.onload;
+      if (typeof window.onload != 'function') {
+        window.onload = func;
+      }
+      else {
+        window.onload = function () {
+          oldonload();
+          func();
+        };
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <h1>flowchart.js</h1>
+  <div id="diagram1"></div>
+  <script>
+    function hello1() {
+      var diagram = flowchart.parse(`st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+para=>parallel: parallel tasks
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->para
+para(path1, bottom)->sub1(right)->op1
+para(path2, top)->op1`);
+      diagram.drawSVG('diagram1');
+    }
+    addLoadEvent(hello1);
+  </script>
+
+<div id="diagram2"></div>
+<script>
+  function hello2() {
+    var diagram = flowchart.parse(`st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+para=>parallel: parallel tasks
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->para
+para(path1, bottom)->sub1(right)->op1
+para(path2, top)->op1`);
+    diagram.drawSVG('diagram2');
+  }
+  addLoadEvent(hello2);
+</script>
+
+<div id="diagram3"></div>
+<script>
+  function hello3() {
+    var diagram = flowchart.parse(`st=>start: Start:>http://www.google.com[blank]
+e=>end:>http://www.google.com
+op1=>operation: My Operation
+sub1=>subroutine: My Subroutine
+cond=>condition: Yes
+or No?:>http://www.google.com
+io=>inputoutput: catch something...
+para=>parallel: parallel tasks
+
+st->op1->cond
+cond(yes)->io->e
+cond(no)->para
+para(path1, bottom)->sub1(right)->op1
+para(path2, top)->op1`);
+    diagram.drawSVG('diagram3');
+  }
+  addLoadEvent(hello3);
+</script>
+</body>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.3.0/raphael.min.js"></script>
+<script src="http://flowchart.js.org/flowchart-latest.js"></script>
+
+</html>
