@@ -5,7 +5,8 @@
   "main": "md2html.js",
   "scripts": {
     "start": "node md2html.js",
-    "release": "pkg -t win md2html.js"
+    "release": "pkg -t win md2html.js",
+    "apply": "./apply.ps1"
   },
   "author": "",
   "license": "ISC",

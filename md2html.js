@@ -177,6 +177,9 @@ function convert(jsonObj) {
             else if (lang === 'jsmind') {
                 return '<script id="' + slugger.slug(lang) + '" type="text/jsmind">' + code + '</script>\n';
             }
+            else if (lang === 'plotly') {
+                return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+            }
             else {
                 return false;
             }
