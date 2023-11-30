@@ -7,5 +7,7 @@
     "wavedromTheme": "lowkey",
     "jsmindTheme": "default",
     "sourcePath": "D:/Code/GitHub/md2html/source",
-    "publicPath": "D:/Code/Gitee/notes/public"
+    "publicPath": "D:/Code/Gitee/notes/public",
+    "allExtensions": ["basic","mathjax","highlight","mermaid","viz","vega","smiles","pseudocode","wavedrom","tikzjax","raphael","flowchart","jsmind","plotly"],
+    "defaultExtensions": ["basic","mathjax","highlight","mermaid"]
 }

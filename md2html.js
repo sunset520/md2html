@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
+const fm = require('front-matter');
 const marked = require('marked');
 const gfmHeadingId = require('marked-gfm-heading-id');
 const extendedTables = require('marked-extended-tables');
@@ -79,6 +80,8 @@ function convert(jsonObj) {
     let jsmindTheme = jsonObj.jsmindTheme;
     let sourcePath = jsonObj.sourcePath;
     let publicPath = jsonObj.publicPath;
+    let allExtensions = jsonObj.allExtensions;
+    let defaultExtensions = jsonObj.defaultExtensions;
 
     let listPath = path.join(sourcePath, 'list.txt');
     let templatePath = path.join(publicPath, 'template.html');
@@ -212,9 +215,13 @@ function convert(jsonObj) {
         const templateHtml = fs.readFileSync(templatePath);
         const htmlName = item.name.replace('.md', '').replace('index', path.basename(path.dirname(item.path))).replace('source', '笔记');
         const htmlPath = item.path.replace('.md', '.html');
-        const contextData = {
+
+        const fileContent = fm(fs.readFileSync(item.path, 'utf-8'));
+        let currentExtensions = fileContent.attributes.extensions ? fileContent.attributes.extensions : [];
+        currentExtensions = currentExtensions.concat(defaultExtensions);
+        let contextData = {
             title: htmlName,
-            content: marked.parse(fs.readFileSync(item.path, 'utf-8')),
+            content: marked.parse(fileContent.body),
             public_path: path.relative(path.dirname(htmlPath), publicPath).split(path.sep).join('/'),
             theme: theme,
             highlight_theme: highlightTheme,
@@ -224,6 +231,17 @@ function convert(jsonObj) {
             jsmind_theme: jsmindTheme
         };
 
+        for(let j = 0; j < allExtensions.length; j++) {
+            let extension = allExtensions[j];
+            contextData[extension+'_1'] = '<!-- ';
+            contextData[extension+'_2'] = ' -->';
+        }
+
+        for(let j = 0; j < currentExtensions.length; j++) {
+            let extension = currentExtensions[j];
+            contextData[extension+'_1'] = '';
+            contextData[extension+'_2'] = '';
+        }
         const compiledHtml = templateCompile(templateHtml, contextData);
         fs.writeFileSync(`${htmlPath}`, compiledHtml);
     }
