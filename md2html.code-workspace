@@ -1,10 +1,12 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"name": "md2html/public",
+			"path": "../../Gitee/notes/public"
 		},
 		{
-			"path": "../../Gitee/notes/public"
+			"name": "md2html",
+			"path": "."
 		}
 	],
 	"settings": {}

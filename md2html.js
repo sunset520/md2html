@@ -6,61 +6,57 @@ const marked = require('marked');
 const gfmHeadingId = require('marked-gfm-heading-id');
 const extendedTables = require('marked-extended-tables');
 const nomnoml = require('nomnoml');
-
-// 遍历读取文件
-function readFile(path, filesList) {
-    const files = fs.readdirSync(path); // 需要用到同步读取
-    files.forEach(walk);
-
-    function walk(file) {
-        const states = fs.statSync(path + '/' + file);
-        if (states.isDirectory()) {
-            readFile(path + '/' + file, filesList);
-        }
-        else if (file.endsWith('.md')) {
-            filesList.push({
-                size: states.size,
-                name: file,
-                path: path + '/' + file
-            });
-        }
-        else {
-            return;
-        }
-    }
-}
-
-// 获取文件夹下所有文件
-function getFileList(path) {
-    const filesList = [];
-    readFile(path, filesList);
-    return filesList;
-}
+const markedAlert = require('marked-alert');
+// const admonition = require('marked-admonition-extension');
 
 // 模板编译
 const templateCompile = (template, data) => {
     return vm.runInNewContext(`\`${template}\``, data);
 };
 
+function readAllFiles(dirPath, filesList) {
+    const files = fs.readdirSync(dirPath);
+    for (const file of files) {
+        const filePath = path.join(dirPath, file);
+        const stats = fs.statSync(filePath);
+        if (stats.isDirectory()) {
+            readAllFiles(filePath, filesList);
+        } else if (file.endsWith('.md')) {
+            filesList.push({
+                size: stats.size,
+                name: file,
+                path: filePath
+            });
+        }
+    }
+}
+
+// 获取文件列表
+function getFileList(dirPath) {
+    const filesList = [];
+    readAllFiles(dirPath, filesList);
+    return filesList;
+}
+
 // 写文件列表
 function writeList(list, listPath) {
-    let content = '';
-    for (let i = 0; i < list.length; i++) {
-        content += `${list[i].path.toString()}#${fs.statSync(list[i].path).mtime.toString()}\n`;
-    }
+    const content = list.map(item => `${item.path.toString()}#${fs.statSync(item.path).mtime.toString()}`).join('\n');
     fs.writeFileSync(listPath, content);
 }
 
-// 读文件列表
+// 读取文件列表
 function readList(listPath) {
+    const fileData = fs.readFileSync(listPath, 'utf-8');
+    const lines = fileData.split('\n');
     const paths = [];
     const times = [];
-    const content = fs.readFileSync(listPath, 'utf-8');
-    content.split('\n').forEach(item => {
-        const [path, time] = item.split('#');
+
+    for (const line of lines) {
+        const [path, time] = line.split('#');
         paths.push(path);
         times.push(time);
-    });
+    }
+
     return {
         path: paths,
         time: times
@@ -119,80 +115,99 @@ function convert(jsonObj) {
 
     // 处理
     const slugger = new marked.Slugger();
-    const hooks = {
-        // 处理反斜杠
-        preprocess(markdown) {
-            return markdown.replace(/\\\\/g, '\\\\\\\\');
+    const customBlash = {
+        name: 'customBlash',
+        level: 'inline',
+        hooks : {
+            // 处理反斜杠
+            preprocess(markdown) {
+                return markdown.replace(/\\\\/g, '\\\\\\\\');
+            }
         }
     };
-    const tokenizer = {
+    const customImage = {
+        name: 'customImage',
+        level: 'block',
+        renderer: {
+            image(href, title, text) {
+                return `<img src="${href}" alt="${text}" class="pic"/>`;
+            }
+        }
     };
-    const renderer = {
-        // 图片
-        image(href, title, text) {
-            return `<img src="${href}" alt="${text}" class="pic"/>`;
-        },
-        // 链接
-        link(href, title, text) {
-            return `<a href="${href.replace('.md', '.html')}">${text}</a>`;
-        },
-        // 代码
-        code(code, infostring, escaped) {
-            const lang = (infostring || '').match(/\S*/)[0];
-            if (this.options.highlight) {
-                const out = this.options.highlight(code, lang);
-                if (out != null && out !== code) {
-                    escaped = true;
-                    code = out;
+    const customLink = {
+        name: 'customLink',
+        level: 'inline',
+        renderer: {
+            link(href, title, text) {
+                return `<a href="${href.replace('.md', '.html')}">${text}</a>`;
+            }
+        }
+    };
+    const customCode = {
+        name: 'customCode',
+        level: 'block',
+        renderer: {
+            code(code, infostring, escaped) {
+                const lang = (infostring || '').match(/\S*/)[0];
+                if (this.options.highlight) {
+                    const out = this.options.highlight(code, lang);
+                    if (out != null && out !== code) {
+                        escaped = true;
+                        code = out;
+                    }
+                }
+                code = code.replace(/\n$/, '') + '\n';
+                if (lang === 'mermaid') {
+                    return '<div class="mermaid">' + code + '</div>\n';
+                }
+                else if (lang === 'smiles') {
+                    return '<canvas class="smiles" id="' + slugger.slug(lang) + '"><div>' + code.trim() + '</div></canvas>';
+                }
+                else if (lang === 'geogebra-graphing' || lang === 'geogebra-geometry' || lang === 'geogebra-3d') {
+                    return '<br /><div class="' + lang + '" id="' + slugger.slug(lang) + '">' + code + '</div><br />';
+                }
+                else if (lang === 'dot') {
+                    return '<div class="dot" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                }
+                else if (lang === 'vega-lite') {
+                    return '<div class="vega-lite" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                }
+                else if (lang === 'pseudocode') {
+                    return '<pre><code class="pseudocode">' + code + '</code></pre>\n';
+                }
+                else if (lang === 'wavedrom') {
+                    return '<script type="WaveDrom">' + code + '</script>\n';
+                }
+                else if (lang === 'nomnoml') {
+                    return nomnoml.renderSvg(code);
+                }
+                else if (lang === 'tikz') {
+                    return '<script type="text/tikz">' + code + '</script>\n';
+                }
+                else if (lang === 'flowchart') {
+                    return '<script id="' + slugger.slug(lang) + '" type="text/flowchart">' + code + '</script>\n';
+                }
+                else if (lang === 'jsmind') {
+                    return '<script id="' + slugger.slug(lang) + '" type="text/jsmind">' + code + '</script>\n';
+                }
+                else if (lang === 'plotly') {
+                    return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                }
+                else {
+                    return false;
                 }
             }
-            code = code.replace(/\n$/, '') + '\n';
-            if (lang === 'mermaid') {
-                return '<div class="mermaid">' + code + '</div>\n';
-            }
-            else if (lang === 'smiles') {
-                return '<canvas class="smiles" id="' + slugger.slug(lang) + '"><div>' + code.trim() + '</div></canvas>';
-            }
-            else if (lang === 'geogebra-graphing' || lang === 'geogebra-geometry' || lang === 'geogebra-3d') {
-                return '<br /><div class="' + lang + '" id="' + slugger.slug(lang) + '">' + code + '</div><br />';
-            }
-            else if (lang === 'dot') {
-                return '<div class="dot" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
-            }
-            else if (lang === 'vega-lite') {
-                return '<div class="vega-lite" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
-            }
-            else if (lang === 'pseudocode') {
-                return '<pre><code class="pseudocode">' + code + '</code></pre>\n';
-            }
-            else if (lang === 'wavedrom') {
-                return '<script type="WaveDrom">' + code + '</script>\n';
-            }
-            else if (lang === 'nomnoml') {
-                return nomnoml.renderSvg(code);
-            }
-            else if (lang === 'tikz') {
-                return '<script type="text/tikz">' + code + '</script>\n';
-            }
-            else if (lang === 'flowchart') {
-                return '<script id="' + slugger.slug(lang) + '" type="text/flowchart">' + code + '</script>\n';
-            }
-            else if (lang === 'jsmind') {
-                return '<script id="' + slugger.slug(lang) + '" type="text/jsmind">' + code + '</script>\n';
-            }
-            else if (lang === 'plotly') {
-                return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
-            }
-            else {
-                return false;
-            }
-        },
-        // 倾斜
-        em(text) {
-            return '_' + text + '_';
         }
     };
-
+    const customEm = {
+        name: 'customEm',
+        level: 'inline',
+        renderer: {
+            em(text) {
+                return '_' + text + '_';
+            }
+        }
+    };
     // 自定义配置
     marked.setOptions({
         gfm: true,
@@ -204,11 +219,27 @@ function convert(jsonObj) {
         smartypants: false,
         mangle: false
     });
-    marked.use({ hooks, tokenizer, renderer });
+    // marked.use({ hooks, tokenizer, renderer });
+    marked.use(customBlash);
+    marked.use(customImage);
+    marked.use(customLink);
+    marked.use(customCode);
+    marked.use(customEm);
     marked.use(gfmHeadingId.gfmHeadingId({
         prefix: 'H-'
     }));
     marked.use(extendedTables());
+    marked.use(markedAlert({
+        variants: [
+            {
+                type: 'danger',
+                icon: '<i class="mr-2">🚨</i>',
+                title: 'Oh snap!', // optional
+                titleClassName: 'text-danger' // optional
+            }
+        ]
+    }));
+    // marked.use(admonition.default);
 
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
@@ -231,16 +262,16 @@ function convert(jsonObj) {
             jsmind_theme: jsmindTheme
         };
 
-        for(let j = 0; j < allExtensions.length; j++) {
+        for (let j = 0; j < allExtensions.length; j++) {
             let extension = allExtensions[j];
-            contextData[extension+'_1'] = '<!-- ';
-            contextData[extension+'_2'] = ' -->';
+            contextData[extension + '_1'] = '<!-- ';
+            contextData[extension + '_2'] = ' -->';
         }
 
-        for(let j = 0; j < currentExtensions.length; j++) {
+        for (let j = 0; j < currentExtensions.length; j++) {
             let extension = currentExtensions[j];
-            contextData[extension+'_1'] = '';
-            contextData[extension+'_2'] = '';
+            contextData[extension + '_1'] = '';
+            contextData[extension + '_2'] = '';
         }
         const compiledHtml = templateCompile(templateHtml, contextData);
         fs.writeFileSync(`${htmlPath}`, compiledHtml);
