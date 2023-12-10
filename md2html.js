@@ -127,7 +127,7 @@ function convert(jsonObj) {
     };
     const customImage = {
         name: 'customImage',
-        level: 'block',
+        level: 'inline',
         renderer: {
             image(href, title, text) {
                 return `<img src="${href}" alt="${text}" class="pic"/>`;
@@ -193,6 +193,15 @@ function convert(jsonObj) {
                 else if (lang === 'plotly') {
                     return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
                 }
+                else if (lang === 'geogebra-graphing') {
+                    return '<div class="geogebra-graphing" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                }
+                else if (lang === 'geogebra-geometrys') {
+                    return '<div class="geogebra-geometrys" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                }
+                else if (lang === 'geogebra-3ds') {
+                    return '<div class="geogebra-3ds" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                }
                 else {
                     return false;
                 }
@@ -208,6 +217,29 @@ function convert(jsonObj) {
             }
         }
     };
+    // const customAdmonition = {
+    //     name: 'customAdmonition',
+    //     level: 'block',
+    //     tokenizer(src,tokens) {
+    //         const rule1 = /^!!!\s+(info|warning)\s+(.*)/;
+    //         const rule2 = /^( {4}[^\n]+(?:\n(?: *(?:\n|$))*)?)+/;
+    //         const match = rule1.exec(src);
+    //         console.log("match", match);
+    //         if (match) {
+    //             const token = {
+    //                 type: 'admonition',
+    //                 raw: match[0],
+    //                 text: match[1],
+    //                 tokens: this.lexer.inline(match[1])
+    //             };
+    //             this.lexer.block(token.text,token.tokens);
+    //             return token;
+    //         }
+    //     },
+    //     renderer(token) {
+    //         return '<div class="admonition ' + token.text + '">' + token.tokens.join('') + '</div>';
+    //     }
+    // };
     // 自定义配置
     marked.setOptions({
         gfm: true,
@@ -219,7 +251,6 @@ function convert(jsonObj) {
         smartypants: false,
         mangle: false
     });
-    // marked.use({ hooks, tokenizer, renderer });
     marked.use(customBlash);
     marked.use(customImage);
     marked.use(customLink);
@@ -239,7 +270,7 @@ function convert(jsonObj) {
             }
         ]
     }));
-    // marked.use(admonition.default);
+    // marked.use(customAdmonition);
 
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
