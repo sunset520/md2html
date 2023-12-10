@@ -7,7 +7,6 @@ const gfmHeadingId = require('marked-gfm-heading-id');
 const extendedTables = require('marked-extended-tables');
 const nomnoml = require('nomnoml');
 const markedAlert = require('marked-alert');
-// const admonition = require('marked-admonition-extension');
 
 // 模板编译
 const templateCompile = (template, data) => {
@@ -118,7 +117,7 @@ function convert(jsonObj) {
     const customBlash = {
         name: 'customBlash',
         level: 'inline',
-        hooks : {
+        hooks: {
             // 处理反斜杠
             preprocess(markdown) {
                 return markdown.replace(/\\\\/g, '\\\\\\\\');
@@ -217,29 +216,35 @@ function convert(jsonObj) {
             }
         }
     };
-    // const customAdmonition = {
-    //     name: 'customAdmonition',
-    //     level: 'block',
-    //     tokenizer(src,tokens) {
-    //         const rule1 = /^!!!\s+(info|warning)\s+(.*)/;
-    //         const rule2 = /^( {4}[^\n]+(?:\n(?: *(?:\n|$))*)?)+/;
-    //         const match = rule1.exec(src);
-    //         console.log("match", match);
-    //         if (match) {
-    //             const token = {
-    //                 type: 'admonition',
-    //                 raw: match[0],
-    //                 text: match[1],
-    //                 tokens: this.lexer.inline(match[1])
-    //             };
-    //             this.lexer.block(token.text,token.tokens);
-    //             return token;
-    //         }
-    //     },
-    //     renderer(token) {
-    //         return '<div class="admonition ' + token.text + '">' + token.tokens.join('') + '</div>';
-    //     }
-    // };
+    const admonitionExtension = {
+        name: 'admonitionExtension',
+        level: 'block',
+        tokenizer(src,tokens) {
+            const rule = /^!!!\s(abstract|attention|bug|caution|danger|error|example|failure|hint|info|note|question|quote|success|tip|warning)\s(.*)\n((\s\s\s\s(.*)\n)*)/;
+            const match = rule.exec(src);
+            if (match) {
+                const token = {
+                    type: 'admonitionExtension',
+                    raw: match[0],
+                    text: match[0].trim(),
+                    kind: match[1].trim(),
+                    title: match[2].trim(),
+                    list: match[3].trim(),
+                    tokens: []
+                };
+                this.lexer.inline(token.text,token.tokens);
+                return token;
+            }
+        },
+        renderer(token) {
+            let str = token.list.split('\n');
+            for (let i = 0; i < str.length; i++) {
+                str[i] = '<p>' + str[i].trim() + '</p>';
+            }
+            str = str.join('');
+            return '<div class="admonition-' + token.kind + '">' + '<p class="admonition-title">'+ token.title +'</p>' + str +'</div>';
+        }
+    };
     // 自定义配置
     marked.setOptions({
         gfm: true,
@@ -270,7 +275,7 @@ function convert(jsonObj) {
             }
         ]
     }));
-    // marked.use(customAdmonition);
+    marked.use({ extensions: [admonitionExtension]});
 
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
