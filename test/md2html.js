@@ -1,14 +1,12 @@
-const path = require('path');
-const fs = require('fs');
-const vm = require('vm');
-const fm = require('front-matter');
-const marked = require('marked');
-const gfmHeadingId = require('marked-gfm-heading-id');
-const extendedTables = require('marked-extended-tables');
-const nomnoml = require('nomnoml');
-const markedAlert = require('marked-alert');
-const bitfieldRender = require('bit-field/lib/render');
-const onml = require('onml');
+import path from 'path';
+import fs from 'fs';
+import vm from 'vm';
+import fm from 'front-matter';
+import { marked } from 'marked';
+import { gfmHeadingId } from "marked-gfm-heading-id";
+import extendedTables from 'marked-extended-tables';
+import nomnoml from 'nomnoml';
+import markedAlert from 'marked-alert';
 
 // 模板编译
 const templateCompile = (template, data) => {
@@ -68,14 +66,21 @@ function readList(listPath) {
 function convert(jsonObj) {
 
     // 读取配置信息
-    let isDebug = jsonObj.is_debug;
-    let sourcePath = jsonObj.source_path;
-    let publicPath = jsonObj.public_path;
-    let allExtensions = jsonObj.all_extensions;
-    let defaultExtensions = jsonObj.default_extensions;
+    let isDebug = jsonObj.isDebug;
+    let theme = jsonObj.theme;
+    let highlightTheme = jsonObj.highlightTheme;
+    let mermaidTheme = jsonObj.mermaidTheme;
+    let smilesTheme = jsonObj.smilesTheme;
+    let wavedromTheme = jsonObj.wavedromTheme;
+    let jsmindTheme = jsonObj.jsmindTheme;
+    let sourcePath = jsonObj.sourcePath;
+    let publicPath = jsonObj.publicPath;
+    let allExtensions = jsonObj.allExtensions;
+    let defaultExtensions = jsonObj.defaultExtensions;
 
     let listPath = path.join(sourcePath, 'list.txt');
     let templatePath = path.join(publicPath, 'template.html');
+
 
     // 获取所有文件
     let fileList = getFileList(sourcePath);
@@ -196,9 +201,6 @@ function convert(jsonObj) {
                 else if (lang === 'geogebra-3ds') {
                     return '<div class="geogebra-3ds" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
                 }
-                else if (lang === 'bitfield') {
-                    return onml.stringify(bitfieldRender(JSON.parse(code)), {});
-                }
                 else {
                     return false;
                 }
@@ -259,7 +261,7 @@ function convert(jsonObj) {
     marked.use(customLink);
     marked.use(customCode);
     marked.use(customEm);
-    marked.use(gfmHeadingId.gfmHeadingId({
+    marked.use(gfmHeadingId({
         prefix: 'H-'
     }));
     marked.use(extendedTables());
@@ -284,12 +286,17 @@ function convert(jsonObj) {
         const fileContent = fm(fs.readFileSync(item.path, 'utf-8'));
         let currentExtensions = fileContent.attributes.extensions ? fileContent.attributes.extensions : [];
         currentExtensions = currentExtensions.concat(defaultExtensions);
-        let documentData = {
+        let contextData = {
             title: htmlName,
             content: marked.parse(fileContent.body),
             public_path: path.relative(path.dirname(htmlPath), publicPath).split(path.sep).join('/'),
+            theme: theme,
+            highlight_theme: highlightTheme,
+            mermaid_theme: mermaidTheme,
+            smiles_theme: smilesTheme,
+            wavedrom_theme: wavedromTheme,
+            jsmind_theme: jsmindTheme
         };
-        let contextData = Object.assign(jsonObj, documentData);
 
         for (let j = 0; j < allExtensions.length; j++) {
             let extension = allExtensions[j];

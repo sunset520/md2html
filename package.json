@@ -11,15 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bit-field": "^1.8.0",
     "front-matter": "^4.0.2",
-    "highlight.js": "^11.8.0",
     "marked": "^7.0.4",
-    "marked-admonition-extension": "^0.0.4",
     "marked-alert": "^2.0.1",
-    "marked-bidi": "^1.0.4",
     "marked-extended-tables": "^1.0.6",
     "marked-gfm-heading-id": "^3.0.6",
-    "marked-highlight": "^2.0.4",
     "nomnoml": "^1.6.2"
   }
 }
