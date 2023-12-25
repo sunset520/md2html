@@ -2,12 +2,59 @@
     "is_debug": true,
     "source_path": "D:/Code/GitHub/md2html/source",
     "public_path": "D:/Code/Gitee/notes/public",
-    "all_extensions": ["basic","mathjax","highlight","mermaid","viz","vega","smiles","pseudocode","wavedrom","tikzjax","raphael","flowchart","jsmind","plotly","geogebra"],
-    "default_extensions": ["basic","mathjax","highlight","mermaid"],
-    "basic_theme": "dark",
-    "highlight_theme": "atom-one-dark",
-    "mermaid_theme": "dark",
-    "smiles_theme": "dark",
-    "wavedrom_theme": "lowkey",
-    "jsmind_theme": "default"
+    "all_extensions": [
+        "basic",
+        "mathjax",
+        "highlight",
+        "mermaid",
+        "viz",
+        "vega",
+        "smiles",
+        "pseudocode",
+        "wavedrom",
+        "tikzjax",
+        "raphael",
+        "flowchart",
+        "jsmind",
+        "plotly",
+        "geogebra"
+    ],
+    "default_extensions": [
+        "basic",
+        "mathjax",
+        "highlight",
+        "mermaid"
+    ],
+    "extensions_config": {
+        "basic_theme": "dark",
+        "highlight_theme": "atom-one-dark",
+        "mermaid_theme": "dark",
+        "smiles_theme": "dark",
+        "wavedrom_theme": "lowkey",
+        "jsmind_theme": "default",
+        "marked_config": {
+            "gfm": true,
+            "tables": true,
+            "breaks": true,
+            "pedantic": false,
+            "sanitize": false,
+            "smartLists": true,
+            "smartypants": false,
+            "mangle": false
+        },
+        "bitfield_config": {},
+        "gfm_heading_id_config": {
+            "prefix": "H-"
+        },
+        "marked_alert_config": {
+            "variants": [
+                {
+                    "type": "danger",
+                    "icon": "<i class='mr-2'>🚨</i>",
+                    "title": "Oh snap!",
+                    "titleClassName": "text-danger"
+                }
+            ]
+        }
+    }
 }

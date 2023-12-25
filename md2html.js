@@ -74,6 +74,8 @@ function convert(jsonObj) {
     let allExtensions = jsonObj.all_extensions;
     let defaultExtensions = jsonObj.default_extensions;
 
+    let extensionsConfigObj = jsonObj.extensions_config;
+
     let listPath = path.join(sourcePath, 'list.txt');
     let templatePath = path.join(publicPath, 'template.html');
 
@@ -187,17 +189,8 @@ function convert(jsonObj) {
                 else if (lang === 'plotly') {
                     return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
                 }
-                else if (lang === 'geogebra-graphing') {
-                    return '<div class="geogebra-graphing" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
-                }
-                else if (lang === 'geogebra-geometrys') {
-                    return '<div class="geogebra-geometrys" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
-                }
-                else if (lang === 'geogebra-3ds') {
-                    return '<div class="geogebra-3ds" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
-                }
                 else if (lang === 'bitfield') {
-                    return onml.stringify(bitfieldRender(JSON.parse(code)), {});
+                    return onml.stringify(bitfieldRender(JSON.parse(code)), extensionsConfigObj.bitfield_config);
                 }
                 else {
                     return false;
@@ -244,35 +237,15 @@ function convert(jsonObj) {
         }
     };
     // 自定义配置
-    marked.setOptions({
-        gfm: true,
-        tables: true,
-        breaks: true,
-        pedantic: false,
-        sanitize: false,
-        smartLists: true,
-        smartypants: false,
-        mangle: false
-    });
+    marked.setOptions(extensionsConfigObj.marked_config);
     marked.use(customBlash);
     marked.use(customImage);
     marked.use(customLink);
     marked.use(customCode);
     marked.use(customEm);
-    marked.use(gfmHeadingId.gfmHeadingId({
-        prefix: 'H-'
-    }));
+    marked.use(gfmHeadingId.gfmHeadingId(extensionsConfigObj.gfm_heading_id_config));
     marked.use(extendedTables());
-    marked.use(markedAlert({
-        variants: [
-            {
-                type: 'danger',
-                icon: '<i class="mr-2">🚨</i>',
-                title: 'Oh snap!', // optional
-                titleClassName: 'text-danger' // optional
-            }
-        ]
-    }));
+    marked.use(markedAlert(extensionsConfigObj.marked_alert_config));
     marked.use({ extensions: [admonitionExtension] });
 
     for (let i = 0; i < needFileList.length; i++) {
@@ -284,12 +257,12 @@ function convert(jsonObj) {
         const fileContent = fm(fs.readFileSync(item.path, 'utf-8'));
         let currentExtensions = fileContent.attributes.extensions ? fileContent.attributes.extensions : [];
         currentExtensions = currentExtensions.concat(defaultExtensions);
-        let documentData = {
+        let documentObj = {
             title: htmlName,
             content: marked.parse(fileContent.body),
             public_path: path.relative(path.dirname(htmlPath), publicPath).split(path.sep).join('/'),
         };
-        let contextData = Object.assign(jsonObj, documentData);
+        let contextData = Object.assign(extensionsConfigObj, documentObj);
 
         for (let j = 0; j < allExtensions.length; j++) {
             let extension = allExtensions[j];
