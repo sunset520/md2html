@@ -3,7 +3,8 @@ const fs = require('fs');
 const vm = require('vm');
 const fm = require('front-matter');
 const marked = require('marked');
-const gfmHeadingId = require('marked-gfm-heading-id');
+const sluggerUnique = require('slugger-unique');
+// const gfmHeadingId = require('marked-gfm-heading-id');
 const extendedTables = require('marked-extended-tables');
 const nomnoml = require('nomnoml');
 const markedAlert = require('marked-alert');
@@ -110,7 +111,7 @@ function convert(jsonObj) {
     console.log('本次需要处理的文章数量：' + needFileList.length);
 
     // 处理
-    const slugger = new marked.Slugger();
+    const slugger = new sluggerUnique();
     const customBlash = {
         name: 'customBlash',
         level: 'inline',
@@ -243,7 +244,7 @@ function convert(jsonObj) {
     marked.use(customLink);
     marked.use(customCode);
     marked.use(customEm);
-    marked.use(gfmHeadingId.gfmHeadingId(extensionsConfigObj.gfm_heading_id_config));
+    // marked.use(gfmHeadingId.gfmHeadingId(extensionsConfigObj.gfm_heading_id_config));
     marked.use(extendedTables());
     marked.use(markedAlert(extensionsConfigObj.marked_alert_config));
     marked.use({ extensions: [admonitionExtension] });

@@ -15,10 +15,11 @@
     "front-matter": "^4.0.2",
     "highlight.js": "^11.9.0",
     "markdown-it": "^14.0.0",
-    "marked": "^7.0.4",
+    "marked": "^11.1.0",
     "marked-alert": "^2.0.1",
     "marked-extended-tables": "^1.0.6",
     "marked-gfm-heading-id": "^3.0.6",
-    "nomnoml": "^1.6.2"
+    "nomnoml": "^1.6.2",
+    "slugger-unique": "^1.0.1"
   }
 }
