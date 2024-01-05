@@ -4,110 +4,76 @@ const vm = require('vm');
 const fm = require('front-matter');
 const marked = require('marked');
 const sluggerUnique = require('slugger-unique');
-// const gfmHeadingId = require('marked-gfm-heading-id');
 const extendedTables = require('marked-extended-tables');
 const nomnoml = require('nomnoml');
 const markedAlert = require('marked-alert');
 const bitfieldRender = require('bit-field/lib/render');
 const onml = require('onml');
 
-// 模板编译
-const templateCompile = (template, data) => {
-    return vm.runInNewContext(`\`${template}\``, data);
-};
+function readAllFiles(dirPath) {
+    let fileList = [];
 
-function readAllFiles(dirPath, filesList) {
-    const files = fs.readdirSync(dirPath);
-    for (const file of files) {
-        const filePath = path.join(dirPath, file);
-        const stats = fs.statSync(filePath);
-        if (stats.isDirectory()) {
-            readAllFiles(filePath, filesList);
-        } else if (file.endsWith('.md')) {
-            filesList.push({
-                size: stats.size,
-                name: file,
-                path: filePath
-            });
+    function traverseDirectory(currentPath) {
+        const files = fs.readdirSync(currentPath);
+
+        for (const file of files) {
+            const filePath = path.join(currentPath, file);
+            const stats = fs.statSync(filePath);
+
+            if (stats.isDirectory()) {
+                traverseDirectory(filePath); // 递归遍历子文件夹
+            } else {
+                if (file.endsWith('.md')) {
+                    fileList.push({
+                        size: stats.size,
+                        name: file,
+                        path: filePath
+                    });
+                }
+            }
         }
     }
-}
 
-// 获取文件列表
-function getFileList(dirPath) {
-    const filesList = [];
-    readAllFiles(dirPath, filesList);
-    return filesList;
-}
-
-// 写文件列表
-function writeList(list, listPath) {
-    const content = list.map(item => `${item.path.toString()}#${fs.statSync(item.path).mtime.toString()}`).join('\n');
-    fs.writeFileSync(listPath, content);
-}
-
-// 读取文件列表
-function readList(listPath) {
-    const fileData = fs.readFileSync(listPath, 'utf-8');
-    const lines = fileData.split('\n');
-    const paths = [];
-    const times = [];
-
-    for (const line of lines) {
-        const [path, time] = line.split('#');
-        paths.push(path);
-        times.push(time);
-    }
-
-    return {
-        path: paths,
-        time: times
-    };
-}
+    traverseDirectory(dirPath);
+    return fileList;
+};
 
 // 转换 md 文件为 html
 function convert(jsonObj) {
 
-    // 读取配置信息
-    let isDebug = jsonObj.is_debug;
-    let sourcePath = jsonObj.source_path;
-    let publicPath = jsonObj.public_path;
-    let allExtensions = jsonObj.all_extensions;
-    let defaultExtensions = jsonObj.default_extensions;
-
-    let extensionsConfigObj = jsonObj.extensions_config;
-
-    let listPath = path.join(sourcePath, 'list.txt');
-    let templatePath = path.join(publicPath, 'template.html');
-
-    // 获取所有文件
-    let fileList = getFileList(sourcePath);
+    let fileList = readAllFiles(jsonObj.source_path);
+    const listPath = path.join(jsonObj.source_path, 'list.txt');
     let needFileList = [];
-    if (isDebug) {
+    if (jsonObj.is_debug) {
         needFileList = fileList;
-    }
-    else {
-        // 只更新修改过的文件
-        let list1 = [];
-        let list2 = [];
-        let obj = readList(listPath);
-        list1 = obj.path;
-        list2 = obj.time;
-        for (let i = 0; i < fileList.length; i++) {
-            if (list1.includes(fileList[i].path.toString())) {
-                let index = list1.indexOf(fileList[i].path.toString());
-                if (list2[index] !== fs.statSync(fileList[i].path).mtime.toString()) {
-                    needFileList.push(fileList[i]);
+    } else {
+        const fileData = fs.readFileSync(listPath, 'utf-8');
+        const lines = fileData.split('\n');
+        const paths = [];
+        const times = [];
+
+        for (const line of lines) {
+            const [path, time] = line.split('#');
+            paths.push(path);
+            times.push(time);
+        }
+        for (const file of fileList) {
+            const filePath = file.path.toString();
+
+            if (paths.includes(filePath)) {
+                const index = paths.indexOf(filePath);
+                const fileModifiedTime = fs.statSync(filePath).mtime.toString();
+
+                if (times[index] !== fileModifiedTime) {
+                    needFileList.push(file);
                 }
-            }
-            else {
-                needFileList.push(fileList[i]);
+            } else {
+                needFileList.push(file);
             }
         }
     }
-    // 写入最新的文件信息
-    writeList(fileList, listPath);
-    // 输出日志
+    const content = fileList.map(item => `${item.path.toString()}#${fs.statSync(item.path).mtime.toString()}`).join('\n');
+    fs.writeFileSync(listPath, content);
     console.log('本次需要处理的文章数量：' + needFileList.length);
 
     // 处理
@@ -191,7 +157,7 @@ function convert(jsonObj) {
                     return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
                 }
                 else if (lang === 'bitfield') {
-                    return onml.stringify(bitfieldRender(JSON.parse(code)), extensionsConfigObj.bitfield_config);
+                    return onml.stringify(bitfieldRender(JSON.parse(code)), jsonObj.extensions_config.bitfield_config);
                 }
                 else {
                     return false;
@@ -238,35 +204,34 @@ function convert(jsonObj) {
         }
     };
     // 自定义配置
-    marked.setOptions(extensionsConfigObj.marked_config);
+    marked.setOptions(jsonObj.extensions_config.marked_config);
     marked.use(customBlash);
     marked.use(customImage);
     marked.use(customLink);
     marked.use(customCode);
     marked.use(customEm);
-    // marked.use(gfmHeadingId.gfmHeadingId(extensionsConfigObj.gfm_heading_id_config));
     marked.use(extendedTables());
-    marked.use(markedAlert(extensionsConfigObj.marked_alert_config));
+    marked.use(markedAlert(jsonObj.extensions_config.marked_alert_config));
     marked.use({ extensions: [admonitionExtension] });
 
+    const templateHtml = fs.readFileSync(path.join(jsonObj.public_path, 'template.html'));
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
-        const templateHtml = fs.readFileSync(templatePath);
-        const htmlName = item.name.replace('.md', '').replace('index', path.basename(path.dirname(item.path))).replace('source', '笔记');
+        const htmlName = item.name.replace('.md', '').replace('index', (path.basename(path.dirname(item.path))) + '-目录').replace('source', '笔记');
         const htmlPath = item.path.replace('.md', '.html');
 
         const fileContent = fm(fs.readFileSync(item.path, 'utf-8'));
         let currentExtensions = fileContent.attributes.extensions ? fileContent.attributes.extensions : [];
-        currentExtensions = currentExtensions.concat(defaultExtensions);
+        currentExtensions = currentExtensions.concat(jsonObj.default_extensions);
         let documentObj = {
             title: htmlName,
             content: marked.parse(fileContent.body),
-            public_path: path.relative(path.dirname(htmlPath), publicPath).split(path.sep).join('/'),
+            public_path: path.relative(path.dirname(htmlPath), jsonObj.public_path).split(path.sep).join('/'),
         };
-        let contextData = Object.assign(extensionsConfigObj, documentObj);
+        let contextData = Object.assign(jsonObj.extensions_config, documentObj);
 
-        for (let j = 0; j < allExtensions.length; j++) {
-            let extension = allExtensions[j];
+        for (let j = 0; j < jsonObj.all_extensions.length; j++) {
+            let extension = jsonObj.all_extensions[j];
             contextData[extension + '_1'] = '<!-- ';
             contextData[extension + '_2'] = ' -->';
         }
@@ -276,24 +241,11 @@ function convert(jsonObj) {
             contextData[extension + '_1'] = '';
             contextData[extension + '_2'] = '';
         }
-        const compiledHtml = templateCompile(templateHtml, contextData);
-        fs.writeFileSync(`${htmlPath}`, compiledHtml);
+        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, contextData);
+        fs.writeFileSync(htmlPath, compiledHtml);
     }
-}
+    console.log('转换完成！');
+};
 
-// 读取JSON文件
-fs.readFile('./config.json', 'utf8', (err, jsonString) => {
-    if (err) {
-        console.log("读取配置文件失败：", err);
-        return;
-    }
-    try {
-        // 将JSON字符串转换为对象
-        const jsonObj = JSON.parse(jsonString);
-        // 调用函数并将数据作为参数传递
-        convert(jsonObj);
-    } catch (err) {
-        console.log('解析失败：', err);
-    }
-});
+convert(JSON.parse(fs.readFileSync('./config.json', 'utf8')));
 

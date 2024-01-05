@@ -19,6 +19,7 @@
     "marked-alert": "^2.0.1",
     "marked-extended-tables": "^1.0.6",
     "marked-gfm-heading-id": "^3.0.6",
+    "mathjax-full": "^3.2.2",
     "nomnoml": "^1.6.2",
     "slugger-unique": "^1.0.1"
   }
