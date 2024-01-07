@@ -9,6 +9,7 @@ const nomnoml = require('nomnoml');
 const markedAlert = require('marked-alert');
 const bitfieldRender = require('bit-field/lib/render');
 const onml = require('onml');
+const markedFootnote = require('marked-footnote');
 
 function readAllFiles(dirPath) {
     let fileList = [];
@@ -213,7 +214,8 @@ function convert(jsonObj) {
     marked.use(extendedTables());
     marked.use(markedAlert(jsonObj.extensions_config.marked_alert_config));
     marked.use({ extensions: [admonitionExtension] });
-
+    marked.use(markedFootnote());
+    
     const templateHtml = fs.readFileSync(path.join(jsonObj.public_path, 'template.html'));
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];

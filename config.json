@@ -26,10 +26,10 @@
         "mermaid"
     ],
     "extensions_config": {
-        "basic_theme": "dark",
-        "highlight_theme": "atom-one-dark",
-        "mermaid_theme": "dark",
-        "smiles_theme": "dark",
+        "basic_theme": "default",
+        "highlight_theme": "atom-one-light",
+        "mermaid_theme": "light",
+        "smiles_theme": "light",
         "wavedrom_theme": "lowkey",
         "jsmind_theme": "default",
         "marked_config": {
