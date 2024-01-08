@@ -26,7 +26,7 @@
         "mermaid"
     ],
     "extensions_config": {
-        "basic_theme": "default",
+        "basic_theme": "mpe",
         "highlight_theme": "atom-one-light",
         "mermaid_theme": "light",
         "smiles_theme": "light",
