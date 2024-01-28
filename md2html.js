@@ -10,6 +10,7 @@ const markedAlert = require('marked-alert');
 const bitfieldRender = require('bit-field/lib/render');
 const onml = require('onml');
 const markedFootnote = require('marked-footnote');
+// const {markedEmoji} = require('marked-emoji');
 
 function readAllFiles(dirPath) {
     let fileList = [];
@@ -37,7 +38,7 @@ function readAllFiles(dirPath) {
 
     traverseDirectory(dirPath);
     return fileList;
-};
+}
 
 // 转换 md 文件为 html
 function convert(jsonObj) {
@@ -122,43 +123,46 @@ function convert(jsonObj) {
                 }
                 code = code.replace(/\n$/, '') + '\n';
                 if (lang === 'mermaid') {
-                    return '<div class="mermaid">' + code + '</div>\n';
+                    return '<div class="mermaid">' + code + '</div>';
                 }
                 else if (lang === 'smiles') {
-                    return '<canvas class="smiles" id="' + slugger.slug(lang) + '"><div>' + code.trim() + '</div></canvas>';
+                    return '<div class="smiles"><canvas class="smiles" id="' + slugger.slug(lang) + '"><div>' + code.trim() + '</div></canvas></div>';
                 }
                 else if (lang === 'geogebra-graphing' || lang === 'geogebra-geometry' || lang === 'geogebra-3d') {
-                    return '<br /><div class="' + lang + '" id="' + slugger.slug(lang) + '">' + code + '</div><br />';
+                    return '<div class="' + lang + '" id="' + slugger.slug(lang) + '">' + code + '</div>';
                 }
                 else if (lang === 'dot') {
-                    return '<div class="dot" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                    return '<div class="dot" id="' + slugger.slug(lang) + '">' + code + '</div>';
                 }
                 else if (lang === 'vega-lite') {
-                    return '<div class="vega-lite" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
+                    return '<div class="vega-lite" id="' + slugger.slug(lang) + '">' + code + '</div>';
                 }
                 else if (lang === 'pseudocode') {
-                    return '<pre><code class="pseudocode">' + code + '</code></pre>\n';
+                    return '<div class="pseudocode"><pre><code class="pseudocode">' + code + '</code></pre></div>';
                 }
                 else if (lang === 'wavedrom') {
-                    return '<script type="WaveDrom">' + code + '</script>\n';
+                    return '<div class="wavedrom"><script type="WaveDrom">' + code + '</script></div>';
                 }
                 else if (lang === 'nomnoml') {
-                    return nomnoml.renderSvg(code);
+                    return '<div class="nomnoml">' + nomnoml.renderSvg(code) + '</div>';
                 }
                 else if (lang === 'tikz') {
-                    return '<script type="text/tikz">' + code + '</script>\n';
+                    return '<div class="tikz"><script type="text/tikz">' + code + '</script></div>';
                 }
                 else if (lang === 'flowchart') {
-                    return '<script id="' + slugger.slug(lang) + '" type="text/flowchart">' + code + '</script>\n';
+                    return '<div class="flowchart"><script id="' + slugger.slug(lang) + '" type="text/flowchart">' + code + '</script></div>';
                 }
                 else if (lang === 'jsmind') {
-                    return '<script id="' + slugger.slug(lang) + '" type="text/jsmind">' + code + '</script>\n';
+                    return '<div class="jsmind"><script id="' + slugger.slug(lang) + '" type="text/jsmind">' + code + '</script></div>';
                 }
                 else if (lang === 'plotly') {
                     return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
                 }
                 else if (lang === 'bitfield') {
-                    return onml.stringify(bitfieldRender(JSON.parse(code)), jsonObj.extensions_config.bitfield_config);
+                    return '<div class="bitfield">' + onml.stringify(bitfieldRender(JSON.parse(code)), jsonObj.extensions_config.bitfield_config) + '</div>';
+                }
+                else if (lang === 'chart') {
+                    return '<div class="chart"><canvas class="chart" id="' + slugger.slug(lang) + '">' + '<div>' + code.trim() + '</div></canvas></div>';
                 }
                 else {
                     return false;
@@ -215,39 +219,31 @@ function convert(jsonObj) {
     marked.use(markedAlert(jsonObj.extensions_config.marked_alert_config));
     marked.use({ extensions: [admonitionExtension] });
     marked.use(markedFootnote());
-    
+    // const emojis = JSON.parse(fs.readFileSync('emojis.json', 'utf-8'));
+    // marked.use(markedEmoji({
+    //     emojis,
+    //     unicode: false,
+    // }));
+
     const templateHtml = fs.readFileSync(path.join(jsonObj.public_path, 'template.html'));
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
         const htmlName = item.name.replace('.md', '').replace('index', (path.basename(path.dirname(item.path))) + '-目录').replace('source', '笔记');
         const htmlPath = item.path.replace('.md', '.html');
-
         const fileContent = fm(fs.readFileSync(item.path, 'utf-8'));
-        let currentExtensions = fileContent.attributes.extensions ? fileContent.attributes.extensions : [];
-        currentExtensions = currentExtensions.concat(jsonObj.default_extensions);
         let documentObj = {
             title: htmlName,
             content: marked.parse(fileContent.body),
             public_path: path.relative(path.dirname(htmlPath), jsonObj.public_path).split(path.sep).join('/'),
         };
         let contextData = Object.assign(jsonObj.extensions_config, documentObj);
-
-        for (let j = 0; j < jsonObj.all_extensions.length; j++) {
-            let extension = jsonObj.all_extensions[j];
-            contextData[extension + '_1'] = '<!-- ';
-            contextData[extension + '_2'] = ' -->';
-        }
-
-        for (let j = 0; j < currentExtensions.length; j++) {
-            let extension = currentExtensions[j];
-            contextData[extension + '_1'] = '';
-            contextData[extension + '_2'] = '';
-        }
+        let currentExtensions = [...(fileContent.attributes.extensions || []), ...jsonObj.default_extensions];
+        contextData.current_extensions = currentExtensions;
         const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, contextData);
         fs.writeFileSync(htmlPath, compiledHtml);
     }
     console.log('转换完成！');
-};
+}
 
 convert(JSON.parse(fs.readFileSync('./config.json', 'utf8')));
 

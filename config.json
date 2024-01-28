@@ -17,7 +17,8 @@
         "flowchart",
         "jsmind",
         "plotly",
-        "geogebra"
+        "geogebra",
+        "chart"
     ],
     "default_extensions": [
         "basic",
@@ -26,7 +27,7 @@
         "mermaid"
     ],
     "extensions_config": {
-        "basic_theme": "mpe",
+        "basic_theme": "default",
         "highlight_theme": "atom-one-light",
         "mermaid_theme": "light",
         "smiles_theme": "light",
