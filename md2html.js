@@ -14,8 +14,10 @@ const markedFootnote = require('marked-footnote');
 
 function readAllFiles(dirPath) {
     let fileList = [];
+    let stack = [dirPath];
 
-    function traverseDirectory(currentPath) {
+    while (stack.length > 0) {
+        let currentPath = stack.pop();
         const files = fs.readdirSync(currentPath);
 
         for (const file of files) {
@@ -23,7 +25,7 @@ function readAllFiles(dirPath) {
             const stats = fs.statSync(filePath);
 
             if (stats.isDirectory()) {
-                traverseDirectory(filePath); // 递归遍历子文件夹
+                stack.push(filePath);
             } else {
                 if (file.endsWith('.md')) {
                     fileList.push({
@@ -36,7 +38,6 @@ function readAllFiles(dirPath) {
         }
     }
 
-    traverseDirectory(dirPath);
     return fileList;
 }
 
@@ -44,12 +45,11 @@ function readAllFiles(dirPath) {
 function convert(jsonObj) {
 
     let fileList = readAllFiles(jsonObj.source_path);
-    const listPath = path.join(jsonObj.source_path, 'list.txt');
     let needFileList = [];
     if (jsonObj.is_debug) {
         needFileList = fileList;
     } else {
-        const fileData = fs.readFileSync(listPath, 'utf-8');
+        const fileData = fs.readFileSync(jsonObj.list_path, 'utf-8');
         const lines = fileData.split('\n');
         const paths = [];
         const times = [];
@@ -75,7 +75,7 @@ function convert(jsonObj) {
         }
     }
     const content = fileList.map(item => `${item.path.toString()}#${fs.statSync(item.path).mtime.toString()}`).join('\n');
-    fs.writeFileSync(listPath, content);
+    fs.writeFileSync(jsonObj.list_path, content);
     console.log('本次需要处理的文章数量：' + needFileList.length);
 
     // 处理
@@ -159,7 +159,7 @@ function convert(jsonObj) {
                     return '<div class="plotly" id="' + slugger.slug(lang) + '">' + code + '</div>\n';
                 }
                 else if (lang === 'bitfield') {
-                    return '<div class="bitfield">' + onml.stringify(bitfieldRender(JSON.parse(code)), jsonObj.extensions_config.bitfield_config) + '</div>';
+                    return '<div class="bitfield">' + onml.stringify(bitfieldRender(JSON.parse(code)), jsonObj.extensions.bitfield.config) + '</div>';
                 }
                 else if (lang === 'chart') {
                     return '<div class="chart"><canvas class="chart" id="' + slugger.slug(lang) + '">' + '<div>' + code.trim() + '</div></canvas></div>';
@@ -209,14 +209,14 @@ function convert(jsonObj) {
         }
     };
     // 自定义配置
-    marked.setOptions(jsonObj.extensions_config.marked_config);
+    marked.setOptions(jsonObj.extensions.marked.config);
     marked.use(customBlash);
     marked.use(customImage);
     marked.use(customLink);
     marked.use(customCode);
     marked.use(customEm);
     marked.use(extendedTables());
-    marked.use(markedAlert(jsonObj.extensions_config.marked_alert_config));
+    marked.use(markedAlert(jsonObj.extensions.alert.config));
     marked.use({ extensions: [admonitionExtension] });
     marked.use(markedFootnote());
     // const emojis = JSON.parse(fs.readFileSync('emojis.json', 'utf-8'));
@@ -225,7 +225,7 @@ function convert(jsonObj) {
     //     unicode: false,
     // }));
 
-    const templateHtml = fs.readFileSync(path.join(jsonObj.public_path, 'template.html'));
+    const templateHtml = fs.readFileSync(jsonObj.template_path);
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
         const htmlName = item.name.replace('.md', '').replace('index', (path.basename(path.dirname(item.path))) + '-目录').replace('source', '笔记');
@@ -236,10 +236,17 @@ function convert(jsonObj) {
             content: marked.parse(fileContent.body),
             public_path: path.relative(path.dirname(htmlPath), jsonObj.public_path).split(path.sep).join('/'),
         };
-        let contextData = Object.assign(jsonObj.extensions_config, documentObj);
-        let currentExtensions = [...(fileContent.attributes.extensions || []), ...jsonObj.default_extensions];
-        contextData.current_extensions = currentExtensions;
-        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, contextData);
+        let extensionsObj = JSON.parse(JSON.stringify(jsonObj.extensions));
+        const documentExtensions = fileContent.attributes.hasOwnProperty('extensions') ? fileContent.attributes.extensions : [];
+        for (key in extensionsObj) {
+            if(documentExtensions.includes(key)) {
+                extensionsObj[key].enabled = true;
+            }
+        }
+
+        // console.log(extensionsObj);
+
+        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, Object.assign({},extensionsObj, documentObj));
         fs.writeFileSync(htmlPath, compiledHtml);
     }
     console.log('转换完成！');

@@ -1,31 +1,123 @@
 {
     "is_debug": true,
     "source_path": "D:/Code/GitHub/md2html/source",
+    "list_path": "D:/Code/GitHub/md2html/source/list.txt",
     "public_path": "D:/Code/Gitee/notes/public",
-    "all_extensions": [
-        "basic",
-        "mathjax",
-        "highlight",
-        "mermaid",
-        "viz",
-        "vega",
-        "smiles",
-        "pseudocode",
-        "wavedrom",
-        "tikzjax",
-        "raphael",
-        "flowchart",
-        "jsmind",
-        "plotly",
-        "geogebra",
-        "chart"
-    ],
-    "default_extensions": [
-        "basic",
-        "mathjax",
-        "highlight",
-        "mermaid"
-    ],
+    "template_path": "D:/Code/Gitee/notes/public/template.html",
+    "extensions": {
+        "basic": {
+            "enabled": true,
+            "config": {
+                "theme": "default"
+            }
+        },
+        "marked": {
+            "enabled": true,
+            "config": {
+                "gfm": true,
+                "tables": true,
+                "breaks": true,
+                "pedantic": false,
+                "sanitize": false,
+                "smartLists": true,
+                "smartypants": false,
+                "mangle": false
+            }
+        },
+        "mathjax": {
+            "enabled": true,
+            "config": {}
+        },
+        "highlight": {
+            "enabled": true,
+            "config": {
+                "theme": "atom-one-light"
+            }
+        },
+        "mermaid": {
+            "enabled": true,
+            "config": {
+                "theme": "light"
+            }
+        },
+        "bitfield": {
+            "enabled": true,
+            "config": {}
+        },
+        "alert": {
+            "enabled": true,
+            "config": {
+                "variants": [
+                    {
+                        "type": "danger",
+                        "icon": "<i class='mr-2'>🚨</i>",
+                        "title": "Oh snap!",
+                        "titleClassName": "text-danger"
+                    }
+                ]
+            }
+        },
+        "nomnoml":{
+            "enabled": true,
+            "config": {
+                
+            }
+        },
+        "viz": {
+            "enabled": false,
+            "config": {}
+        },
+        "vega": {
+            "enabled": false,
+            "config": {}
+        },
+        "smiles": {
+            "enabled": false,
+            "config": {
+                "theme": "light"
+            }
+        },
+        "pseudocode": {
+            "enabled": false,
+            "config": {}
+        },
+        "wavedrom": {
+            "enabled": false,
+            "config": {
+                "theme": "lowkey"
+            }
+        },
+        "tikzjax": {
+            "enabled": false,
+            "config": {}
+        },
+        "raphael": {
+            "enabled": false,
+            "config": {}
+        },
+        "flowchart": {
+            "enabled": false,
+            "config": {}
+        },
+        "jsmind": {
+            "enabled": false,
+            "config": {
+                "theme": "default"
+            }
+        },
+        "plotly": {
+            "enabled": false,
+            "config": {}
+        },
+        "geogebra": {
+            "enabled": false,
+            "config": {}
+        },
+        "chart": {
+            "enabled": false,
+            "config": {}
+        }
+    },
     "extensions_config": {
         "basic_theme": "default",
         "highlight_theme": "atom-one-light",
@@ -44,9 +136,6 @@
             "mangle": false
         },
         "bitfield_config": {},
-        "gfm_heading_id_config": {
-            "prefix": "H-"
-        },
         "marked_alert_config": {
             "variants": [
                 {
