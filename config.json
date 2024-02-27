@@ -4,15 +4,9 @@
     "list_path": "D:/Code/GitHub/md2html/source/list.txt",
     "public_path": "D:/Code/Gitee/notes/public",
     "template_path": "D:/Code/Gitee/notes/public/template.html",
-    "extensions": {
-        "basic": {
-            "enabled": true,
-            "config": {
-                "theme": "default"
-            }
-        },
+    "default_tool": "marked",
+    "tools": {
         "marked": {
-            "enabled": true,
             "config": {
                 "gfm": true,
                 "tables": true,
@@ -22,6 +16,21 @@
                 "smartLists": true,
                 "smartypants": false,
                 "mangle": false
+            }
+        },
+        "markdownit": {
+            "config": {
+                "html": true,
+                "linkify": true,
+                "typographer": true
+            }
+        }
+    },
+    "extensions": {
+        "basic": {
+            "enabled": true,
+            "config": {
+                "theme": "default"
             }
         },
         "mathjax": {
@@ -57,11 +66,9 @@
                 ]
             }
         },
-        "nomnoml":{
+        "nomnoml": {
             "enabled": true,
-            "config": {
-                
-            }
+            "config": {}
         },
         "viz": {
             "enabled": false,
@@ -116,35 +123,10 @@
         "chart": {
             "enabled": false,
             "config": {}
-        }
-    },
-    "extensions_config": {
-        "basic_theme": "default",
-        "highlight_theme": "atom-one-light",
-        "mermaid_theme": "light",
-        "smiles_theme": "light",
-        "wavedrom_theme": "lowkey",
-        "jsmind_theme": "default",
-        "marked_config": {
-            "gfm": true,
-            "tables": true,
-            "breaks": true,
-            "pedantic": false,
-            "sanitize": false,
-            "smartLists": true,
-            "smartypants": false,
-            "mangle": false
         },
-        "bitfield_config": {},
-        "marked_alert_config": {
-            "variants": [
-                {
-                    "type": "danger",
-                    "icon": "<i class='mr-2'>🚨</i>",
-                    "title": "Oh snap!",
-                    "titleClassName": "text-danger"
-                }
-            ]
+        "qrcode": {
+            "enabled": false,
+            "config": {}
         }
     }
 }

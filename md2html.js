@@ -3,6 +3,7 @@ const fs = require('fs');
 const vm = require('vm');
 const fm = require('front-matter');
 const marked = require('marked');
+const markdownIt = require('markdown-it');
 const sluggerUnique = require('slugger-unique');
 const extendedTables = require('marked-extended-tables');
 const nomnoml = require('nomnoml');
@@ -78,7 +79,7 @@ function convert(jsonObj) {
     fs.writeFileSync(jsonObj.list_path, content);
     console.log('本次需要处理的文章数量：' + needFileList.length);
 
-    // 处理
+    // Marked 配置------------------------------------------------------
     const slugger = new sluggerUnique();
     const customBlash = {
         name: 'customBlash',
@@ -164,6 +165,9 @@ function convert(jsonObj) {
                 else if (lang === 'chart') {
                     return '<div class="chart"><canvas class="chart" id="' + slugger.slug(lang) + '">' + '<div>' + code.trim() + '</div></canvas></div>';
                 }
+                else if (lang === 'qrcode') {
+                    return '<div class="qrcode">' + code.trim() + '</div>';
+                }
                 else {
                     return false;
                 }
@@ -209,7 +213,7 @@ function convert(jsonObj) {
         }
     };
     // 自定义配置
-    marked.setOptions(jsonObj.extensions.marked.config);
+    marked.setOptions(jsonObj.tools.marked.config);
     marked.use(customBlash);
     marked.use(customImage);
     marked.use(customLink);
@@ -225,6 +229,12 @@ function convert(jsonObj) {
     //     unicode: false,
     // }));
 
+    // Marked 配置------------------------------------------------------
+
+    // MarkdownIt 配置--------------------------------------------------
+    let markdownit = new markdownIt(jsonObj.tools.markdownit.config);
+    // MarkdownIt 配置--------------------------------------------------
+
     const templateHtml = fs.readFileSync(jsonObj.template_path);
     for (let i = 0; i < needFileList.length; i++) {
         const item = needFileList[i];
@@ -233,20 +243,22 @@ function convert(jsonObj) {
         const fileContent = fm(fs.readFileSync(item.path, 'utf-8'));
         let documentObj = {
             title: htmlName,
-            content: marked.parse(fileContent.body),
             public_path: path.relative(path.dirname(htmlPath), jsonObj.public_path).split(path.sep).join('/'),
         };
+        if (jsonObj.default_tool == 'marked') {
+            documentObj.content = marked.parse(fileContent.body);
+        }
+        else if (jsonObj.default_tool == 'markdownit') {
+            documentObj.content = markdownit.render(fileContent.body);
+        }
         let extensionsObj = JSON.parse(JSON.stringify(jsonObj.extensions));
         const documentExtensions = fileContent.attributes.hasOwnProperty('extensions') ? fileContent.attributes.extensions : [];
         for (key in extensionsObj) {
-            if(documentExtensions.includes(key)) {
+            if (documentExtensions.includes(key)) {
                 extensionsObj[key].enabled = true;
             }
         }
-
-        // console.log(extensionsObj);
-
-        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, Object.assign({},extensionsObj, documentObj));
+        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, Object.assign({}, extensionsObj, documentObj));
         fs.writeFileSync(htmlPath, compiledHtml);
     }
     console.log('转换完成！');
