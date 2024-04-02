@@ -252,13 +252,22 @@ function convert(jsonObj) {
             documentObj.content = markdownit.render(fileContent.body);
         }
         let extensionsObj = JSON.parse(JSON.stringify(jsonObj.extensions));
+        let fontsObj = JSON.parse(JSON.stringify(jsonObj.fonts));
         const documentExtensions = fileContent.attributes.hasOwnProperty('extensions') ? fileContent.attributes.extensions : [];
         for (key in extensionsObj) {
             if (documentExtensions.includes(key)) {
                 extensionsObj[key].enabled = true;
             }
         }
-        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, Object.assign({}, extensionsObj, documentObj));
+        const documentFonts = fileContent.attributes.hasOwnProperty('fonts') ? fileContent.attributes.fonts : [];
+        for (key in fontsObj) {
+            if (documentFonts.includes(key)) {
+                fontsObj[key].enabled = true;
+            }
+        }
+        documentObj.extensions = extensionsObj;
+        documentObj.fonts = fontsObj;
+        const compiledHtml = vm.runInNewContext(`\`${templateHtml}\``, documentObj);
         fs.writeFileSync(htmlPath, compiledHtml);
     }
     console.log('转换完成！');

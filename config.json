@@ -128,5 +128,16 @@
             "enabled": false,
             "config": {}
         }
+    },
+    "fonts": {
+        "tangut": {
+            "enabled": false
+        },
+        "khitanjurchen": {
+            "enabled": false
+        },
+        "nushu": {
+            "enabled": false
+        }
     }
 }
