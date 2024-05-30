@@ -127,7 +127,7 @@ function convert(jsonObj) {
                     return '<div class="mermaid">' + code + '</div>';
                 }
                 else if (lang === 'smiles') {
-                    return '<div class="smiles"><canvas class="smiles" id="' + slugger.slug(lang) + '"><div>' + code.trim() + '</div></canvas></div>';
+                    return '<div class="smiles"><img id="' + slugger.slug(lang) + '"/><div>' + code.trim() + '</div></div>';
                 }
                 else if (lang === 'geogebra-graphing' || lang === 'geogebra-geometry' || lang === 'geogebra-3d') {
                     return '<div class="' + lang + '" id="' + slugger.slug(lang) + '">' + code + '</div>';
