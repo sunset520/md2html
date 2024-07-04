@@ -1,0 +1,178 @@
+/* 正文 */
+div.markdown-body {
+    font-size: 16px;
+    font-family: "微软雅黑",'Tangut','KhitanJurchen','Nushu';
+    line-height: 1.8rem;
+    font-weight: 400;
+    word-wrap: break-word;
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+}
+
+/* 水平线 */
+div.markdown-body hr {
+    overflow: visible;
+    box-sizing: content-box;
+    height: 0;
+}
+
+/* 加粗 */
+div.markdown-body b,
+div.markdown-body strong {
+    font-weight: bolder;
+}
+
+/* 表格 */
+div.markdown-body table {
+    empty-cells: show;
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: block;
+    width: 100%;
+    overflow: auto;
+    word-break: normal;
+    word-break: keep-all
+}
+
+div.markdown-body table th {
+    padding: 0 1rem;
+    border: 0.1rem solid black;
+    background: rgba(158, 188, 226, 0.2);
+    text-align: center !important;
+    font-weight: bold;
+}
+
+div.markdown-body table tbody tr:nth-child(2n) {
+    background: rgba(158, 188, 226, 0.12);
+}
+
+div.markdown-body table td {
+    padding: 0 1rem;
+    height: 2rem;
+    border: 0.1rem solid black;
+}
+
+/* 列表 */
+div.markdown-body ul,
+div.markdown-body ol,
+div.markdown-body dl {
+    margin-left: 2rem;
+    padding-left: 0;
+}
+
+/* 图片 */
+div.markdown-body img {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 50rem;
+    width: 100%;
+    border-style: none;
+}
+
+/* div.markdown-body img.marked-emoji-img {
+    all: revert;
+} */
+
+/* 多选框 */
+div.markdown-body input[type="checkbox"] {
+    position: relative;
+    margin-top: 0;
+    min-width: 1rem;
+    min-height: 1rem;
+    border: #999 solid 0.1rem;
+    border-radius: 0.2rem;
+    background: #fff;
+    vertical-align: middle;
+    cursor: pointer;
+    appearance: none;
+}
+
+div.markdown-body input[type="checkbox"]:checked {
+    border: none;
+    background: #409eff;
+}
+
+div.markdown-body input[type="checkbox"]:checked::after {
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 0.6rem;
+    height: 0.4rem;
+    border: #fff solid 0.1rem;
+    border-top: none;
+    border-right: none;
+    background: transparent;
+    content: '';
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+/* 链接 */
+div.markdown-body a:link {
+    color: blue;
+    text-decoration: none;
+    border-bottom: 1px solid #2d83d3;
+
+    &:hover {
+        color: rgb(167, 30, 53);
+        text-decoration: none;
+    }
+
+    &:active {
+        color: rgb(167, 30, 53);
+        text-decoration: none;
+    }
+
+    &:visited {
+        color: blue;
+        text-decoration: none;
+    }
+}
+
+/* 代码 */
+div.markdown-body pre,
+div.markdown-body code {
+    overflow-x: auto !important;
+    color: green;
+    white-space: pre !important;
+    word-wrap: initial !important;
+    word-break: keep-all !important;
+    font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* 引用 */
+div.markdown-body blockquote {
+    color: #666;
+    padding: 0.1rem 1.5rem;
+    margin: 1.8rem 0;
+    border-left: 0.3rem solid #ccc;
+    background-color: #f8f8f8;
+}
+
+/* 滑动条 */
+div.markdown-body ::-webkit-scrollbar {
+    width: 0.2rem;
+    height: 0.2rem;
+}
+
+div.markdown-body ::-webkit-scrollbar-track {
+    border-radius: 0;
+    background: none;
+}
+
+div.markdown-body ::-webkit-scrollbar-thumb {
+    border-radius: 0.1rem;
+    background-color: white;
+    -webkit-box-shadow: inset 0 0 0.1rem rgba(0, 0, 0, .2);
+}
+
+div.markdown-body ::-webkit-scrollbar-thumb:hover {
+    border-radius: 0.1rem;
+    background-color: white;
+    -webkit-box-shadow: inset 0 0 0.1rem rgba(0, 0, 0, .2);
+}

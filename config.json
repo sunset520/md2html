@@ -1,9 +1,9 @@
 {
     "is_debug": true,
-    "source_path": "D:/Code/GitHub/md2html/source",
-    "list_path": "D:/Code/GitHub/md2html/source/list.txt",
-    "public_path": "D:/Code/Gitee/notes/public",
-    "template_path": "D:/Code/Gitee/notes/public/template.html",
+    "source_path": "./source",
+    "list_path": "./source/list.txt",
+    "public_path": "./public",
+    "template_path": "./public/template.html",
     "default_tool": "marked",
     "tools": {
         "marked": {

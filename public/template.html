@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<title>${title || '文档'}</title>
+<link rel="shortcut icon bookmark" href="${public_path}/custom/img/favicon.ico" />
+<!-- CSS -->${extensions.basic.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/custom/css/basic.css" />
+<link rel="stylesheet" type="text/css" href="${public_path}/custom/css/${extensions.basic.config.theme}.css" />`
+: ``}${extensions.highlight.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/highlight/styles/${extensions.highlight.config.theme}.min.css" />`
+: ``}${extensions.pseudocode.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/pseudocode/pseudocode.min.css" />
+<link rel="stylesheet" type="text/css" href="${public_path}/katex/katex.min.css" />`
+: ``}${extensions.jsmind.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/jsmind/jsmind.css" />`
+: ``}${fonts.tangut.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/custom/fonts-css/tangut.css" />`
+: ``}${fonts.khitanjurchen.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/custom/fonts-css/khitanjurchen.css" />`
+: ``}${fonts.nushu.enabled ?
+`\n<link rel="stylesheet" type="text/css" href="${public_path}/custom/fonts-css/nushu.css" />`
+: ``}
+</head>
+<body>
+<div id="main" class="markdown-body">${content}</div>
+<div id="outerdiv"><div id="innerdiv"><img id="bigimg" src="" /></div></div>
+<button onclick="topFunction()" id="topBtn">↑</button>
+</body>
+<!-- JS -->${extensions.basic.enabled ?
+`\n<script src="${public_path}/jquery/jquery-1.7.2.min.js"></script>
+<script src="${public_path}/custom/js/up2top.js"></script>
+<script src="${public_path}/custom/js/big-picture.js"></script>
+<script src="${public_path}/custom/js/toc-config.js"></script>`
+: ``}${extensions.mathjax.enabled ?
+`\n<script src="${public_path}/custom/js/mathjax-config.js" defer></script>
+<script src="${public_path}/mathjax/tex-chtml.js" defer></script>`
+: ``}${extensions.highlight.enabled ?
+`\n<script src="${public_path}/highlight/highlight.min.js"></script>
+<script src="${public_path}/custom/js/highlight-config.js"></script>
+<script src="${public_path}/custom/js/copy-code.js"></script>`
+: ``}${extensions.mermaid.enabled ?
+`\n<script src="${public_path}/mermaid/mermaid.min.js"></script>
+<script src="${public_path}/custom/js/mermaid-config.js?theme=${extensions.mermaid.config.theme}"></script>`
+: ``}${extensions.viz.enabled ?
+`\n<script src="${public_path}/viz/viz.js"></script>
+<script src="${public_path}/viz/full.render.js"></script>
+<script src="${public_path}/custom/js/viz-config.js"></script>`
+: ``}${extensions.vega.enabled ?
+`\n<script src="${public_path}/vega/vega.min.js"></script>
+<script src="${public_path}/vega-lite/vega-lite.min.js"></script>
+<script src="${public_path}/vega-embed/vega-embed.min.js"></script>
+<script src="${public_path}/custom/js/vega-config.js"></script>`
+: ``}${extensions.smiles.enabled ?
+`\n<script src="${public_path}/smiles-drawer/smiles-drawer.min.js"></script>
+<script src="${public_path}/custom/js/smiles-drawer-config.js?theme=${extensions.smiles.config.theme}"></script>`
+: ``}${extensions.pseudocode.enabled ?
+`\n<script src="${public_path}/katex/katex.min.js"></script>
+<script src="${public_path}/pseudocode/pseudocode.min.js"></script>
+<script src="${public_path}/custom/js/pseudocode-config.js"></script>`
+: ``}${extensions.wavedrom.enabled ?
+`\n<script src="${public_path}/wavedrom/skins/${extensions.wavedrom.config.theme}.js"></script>
+<script src="${public_path}/wavedrom/wavedrom.min.js"></script>
+<script src="${public_path}/custom/js/wavedrom-config.js"></script>`
+: ``}${extensions.tikzjax.enabled ?
+`\n<script src="${public_path}/tikzjax/tikzjax.js"></script>`
+: ``}${extensions.raphael.enabled ?
+`\n<script src="${public_path}/raphael/raphael.min.js"></script>`
+: ``}${extensions.flowchart.enabled ?
+`\n<script src="${public_path}/flowchart/flowchart.js"></script>
+<script src="${public_path}/custom/js/flowchart-config.js"></script>`
+: ``}${extensions.jsmind.enabled ?
+`\n<script src="${public_path}/jsmind/jsmind.js"></script>
+<script src="${public_path}/custom/js/jsmind-config.js?theme=${extensions.jsmind.config.theme}"></script>`
+: ``}${extensions.plotly.enabled ?
+`\n<script src="${public_path}/plotly/plotly.min.js"></script>
+<script src="${public_path}/custom/js/plotly-config.js"></script>`
+: ``}${extensions.geogebra.enabled ?
+`\n<script src="${public_path}/geogebra/deployggb.js"></script>
+<script src="${public_path}/custom/js/geogebra-config.js?path=${public_path}"></script>`
+: ``}${extensions.chart.enabled ?
+`\n<script src="${public_path}/chart/chart.umd.js"></script>
+<script src="${public_path}/custom/js/chart-config.js"></script>`
+: ``}${extensions.qrcode.enabled ?
+`\n<script src="${public_path}/qrcode-svg/qrcode.min.js"></script>
+<script src="${public_path}/custom/js/qrcode-config.js"></script>`
+: ``}
+</html>

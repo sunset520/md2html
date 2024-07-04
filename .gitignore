@@ -1,7 +1,7 @@
 node_modules/
-.chat/
 .vscode/
 source/
-public/
+public/mathjax
+public/geogebra
 temp/
 *.exe
