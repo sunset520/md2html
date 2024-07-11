@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pseudocode</title>
+    <!-- CSS -->
+    <link rel="shortcut icon bookmark" href="../public/custom/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="../public/custom/css/basic.css" />
+    <link rel="stylesheet" type="text/css" href="../public/custom/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="../public/pseudocode/pseudocode.min.css" />
+</head>
+
+<body>
+    <div id="main" class="markdown-body">
+        <div><textarea id="e1" cols="200" rows="10" placeholder="代码"></textarea></div>
+        <button>转换</button><br>
+        <div class="pseudocode" id="e2"></div>
+    </div>
+</body>
+<!-- JS -->
+<script>
+    document.querySelector("button").onclick = function () {
+        const source = document.querySelector("#e1").value;
+        const pseudocode_options = {
+            lineNumber: true
+        };
+        const parentEl = document.querySelector("#e2");
+        parentEl.innerHTML = "";
+        pseudocode.render(source, parentEl, pseudocode_options);
+        $(parentEl).replaceWith($(`<div id="e2">${parentEl.innerHTML}</div>`));
+    };
+</script>
+<script src="../public/jquery/jquery-1.7.2.min.js"></script>
+<script src="../public/katex/katex.min.js"></script>
+<script src="../public/pseudocode/pseudocode.min.js"></script>
+<script>
+    $("textarea").on('keydown', function (e) {
+    if (e.keyCode == 9) {
+        e.preventDefault();
+        var indent = '    ';
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        var selected = window.getSelection().toString();
+        selected = indent + selected.replace(/\n/g, '\n' + indent);
+        this.value = this.value.substring(0, start) + selected + this.value.substring(end);
+        this.setSelectionRange(start + indent.length, start + selected.length);
+    }
+});
+</script>
+</html>

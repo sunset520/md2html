@@ -1,7 +1,5 @@
 node_modules/
 .vscode/
 source/
-public/mathjax
-public/geogebra
 temp/
 *.exe

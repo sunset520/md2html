@@ -482,11 +482,11 @@ button#topBtn:hover {
 
 /* 数学公式 */
 /* mjx-container {
-    overflow-x: auto;
-    overflow-y: hidden;
-}
+    overflow-x: scroll;
+    overflow-y: visible;
+} */
 
-mjx-container[width="full"]{
+/* mjx-container[width="full"]{
     overflow-x: auto;
     overflow-y: hidden;
 } */
