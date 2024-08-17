@@ -26,9 +26,7 @@ if (jsmind_urlparse.length > 1) {
   }
 }
 
-const jsmindScripts = Array.from(document.getElementsByTagName('script')).filter(e => e.getAttribute('type') === 'text/jsmind');
-
-jsmindScripts.reduce(async (promise, element) => {
+Array.from(document.getElementsByTagName('script')).filter(e => e.getAttribute('type') === 'text/jsmind').reduce(async (promise, element) => {
   await promise;
   return jsmind_process(element, jsmind_values['theme']);
 }, Promise.resolve());

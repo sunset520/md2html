@@ -1,48 +1,50 @@
 window.MathJax = {
-  loader: {
-    load: ['ui/lazy', '[tex]/mhchem', '[tex]/enclose'],
-    paths: {
-      'mathjax-modern': '../../mathjax-modern-font'
-    }
-  },
-  options: {
-    enableMenu: true,
-    menuOptions: {
-      settings: {
-        // wideExpressions: 'scroll',
-        enrich: false
-      }
+    loader: {
+        load: ['ui/lazy', '[tex]/mhchem', '[tex]/enclose'],
+        paths: {
+            'mathjax-modern': '../../mathjax-modern-font'
+        }
     },
-    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'annotation', 'annotation-xml']
-  },
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['$$', '$$'], ['\\[', '\\]']],
-    packages: { '[+]': ['mhchem', 'enclose'] },
-    tags: 'ams',
-    macros: {
-      'coloneqq': ':=',
-      'oiint': '∯',
-      'oiiint': '∰',
-      'knotneacsea': '⤮',
-      'knotseacnea': '⤭',
-      'knotrdcfd': '⤫',
-      'knotfdcrd': '⤬'
+    options: {
+        enableMenu: true,
+        menuOptions: {
+            settings: {
+                // wideExpressions: 'scroll',
+                enrich: false
+            }
+        },
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'annotation', 'annotation-xml']
+    },
+    tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        packages: { '[+]': ['mhchem', 'enclose'] },
+        tags: 'ams',
+        macros: {
+            'coloneqq': ':=',
+            'oiint': '∯',
+            'oiiint': '∰',
+            'knotneacsea': '⤮',
+            'knotseacnea': '⤭',
+            'knotrdcfd': '⤫',
+            'knotfdcrd': '⤬',
+            'bigudot': '⨃',
+            'bigtimes': '⨉'
+        }
+    },
+    svg: {
+        fontCache: 'global'
+    },
+    output: {
+        font: 'mathjax-tex',
+        displayOverflow: 'scroll',
+        linebreaks: {
+            inline: true,
+            width: '100%',
+            lineleading: .2,
+            LinebreakVisitor: null
+        }
     }
-  },
-  svg: {
-    fontCache: 'global'
-  },
-  output: {
-    font: 'mathjax-tex',
-    displayOverflow: 'scroll',
-    linebreaks: {
-      inline: true,
-      width: '100%',
-      lineleading: .2,
-      LinebreakVisitor: null
-    }
-  }
 };
 
 // mjx-container.setAttribute('overflow', 'scroll');

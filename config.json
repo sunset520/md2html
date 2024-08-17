@@ -24,6 +24,11 @@
                 "linkify": true,
                 "typographer": true
             }
+        },
+        "remarkable": {
+            "config": {
+                
+            }
         }
     },
     "extensions": {

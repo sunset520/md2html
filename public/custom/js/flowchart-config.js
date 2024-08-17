@@ -7,9 +7,7 @@ const flowchart_process = async (elt) => {
     diagram.drawSVG(div.id);
 };
 
-const flowchartScripts = Array.from(document.getElementsByTagName('script')).filter(e => e.getAttribute('type') === 'text/flowchart');
-
-flowchartScripts.reduce(async (promise, element) => {
+Array.from(document.getElementsByTagName('script')).filter(e => e.getAttribute('type') === 'text/flowchart').reduce(async (promise, element) => {
     await promise;
     return flowchart_process(element);
 }, Promise.resolve());

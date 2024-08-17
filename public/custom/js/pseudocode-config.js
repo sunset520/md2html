@@ -1,9 +1,8 @@
-const pseudocodes = document.querySelectorAll("code.pseudocode");
 const pseudocode_options = {
     lineNumber: true
 };
 
-pseudocodes.forEach((pse) => {
+document.querySelectorAll("code.pseudocode").forEach((pse) => {
     const code = pse.textContent;
     const parentEl = pse.parentElement;
     pseudocode.render(code, parentEl, pseudocode_options);

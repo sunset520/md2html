@@ -4,9 +4,8 @@ const vm = require('vm');
 const fm = require('front-matter');
 const marked = require('marked');
 const markdownIt = require('markdown-it');
-const remarkable = require('remarkable');
 const sluggerUnique = require('slugger-unique');
-// const extendedTables = require('marked-extended-tables');
+const extendedTables = require('marked-extended-tables');
 const nomnoml = require('nomnoml');
 const markedAlert = require('marked-alert');
 const bitfieldRender = require('bit-field/lib/render');
@@ -96,8 +95,8 @@ function convert(jsonObj) {
         name: 'customImage',
         level: 'inline',
         renderer: {
-            image(tokens) {
-                return `<img src="${tokens.href}" alt="${tokens.text}" class="pic"/>`;
+            image(href, title, text) {
+                return `<img src="${href}" alt="${text}" class="pic"/>`;
             }
         }
     };
@@ -105,8 +104,8 @@ function convert(jsonObj) {
         name: 'customLink',
         level: 'inline',
         renderer: {
-            link(tokens){
-                return `<a href="${tokens.href.replace('.md', '.html')}">${tokens.text}</a>`;
+            link(href, title, text) {
+                return `<a href="${href.replace('.md', '.html')}">${text}</a>`;
             }
         }
     };
@@ -114,9 +113,8 @@ function convert(jsonObj) {
         name: 'customCode',
         level: 'block',
         renderer: {
-            code(tokens) {
-                let code = tokens.text;
-                const lang = (tokens.lang || '').match(/\S*/)[0];
+            code(code, infostring, escaped) {
+                const lang = (infostring || '').match(/\S*/)[0];
                 if (this.options.highlight) {
                     const out = this.options.highlight(code, lang);
                     if (out != null && out !== code) {
@@ -180,8 +178,8 @@ function convert(jsonObj) {
         name: 'customEm',
         level: 'inline',
         renderer: {
-            em(tokens) {
-                return '_' + tokens.text + '_';
+            em(text) {
+                return '_' + text + '_';
             }
         }
     };
@@ -221,7 +219,7 @@ function convert(jsonObj) {
     marked.use(customLink);
     marked.use(customCode);
     marked.use(customEm);
-    // marked.use(extendedTables()); // 不支持了
+    marked.use(extendedTables());
     marked.use(markedAlert(jsonObj.extensions.alert.config));
     marked.use({ extensions: [admonitionExtension] });
     marked.use(markedFootnote());
@@ -236,10 +234,6 @@ function convert(jsonObj) {
     // MarkdownIt 配置--------------------------------------------------
     let markdownit = new markdownIt(jsonObj.tools.markdownit.config);
     // MarkdownIt 配置--------------------------------------------------
-
-    // Remarkable 配置--------------------------------------------------
-    let remarkableTool = new remarkable.Remarkable(jsonObj.tools.remarkable.config);
-    // Remarkable 配置--------------------------------------------------
 
     const templateHtml = fs.readFileSync(jsonObj.template_path);
     for (let i = 0; i < needFileList.length; i++) {
@@ -256,9 +250,6 @@ function convert(jsonObj) {
         }
         else if (jsonObj.default_tool == 'markdownit') {
             documentObj.content = markdownit.render(fileContent.body);
-        }
-        else if (jsonObj.default_tool == 'remarkable') {
-            documentObj.content = remarkableTool.render(fileContent.body);
         }
         let extensionsObj = JSON.parse(JSON.stringify(jsonObj.extensions));
         let fontsObj = JSON.parse(JSON.stringify(jsonObj.fonts));
