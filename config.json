@@ -20,9 +20,9 @@
         },
         "markdownit": {
             "config": {
-                "html": true,
+                "html": false,
                 "linkify": true,
-                "typographer": true
+                "breaks": true
             }
         },
         "remarkable": {

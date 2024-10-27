@@ -39,14 +39,14 @@ npm run start
 npm run release
 ```
 
-## 功能
+## 依赖
 
-- [x] Highlight
-- [x] MathJax
-- [x] Mermaid
-- [x] Pseudocode
-- [x] Smiles-drawer
-- [x] Vega
-- [x] Viz
-- [x] Wavedrom
-- [x] nomnoml
+### Markdown 转 HTML
+
+- [Marked](https://github.com/markedjs/marked)
+- [markdown-it](https://github.com/markdown-it/markdown-it)
+- [remarkable](https://github.com/jonschlinkert/remarkable)
+
+### 扩展功能
+
+- [MathJax]
